@@ -1,4 +1,11 @@
 import "package:flutter/material.dart";
+import 'package:intl/intl.dart';
+import 'package:santo_day/controller/api_controller.dart';
+import 'package:santo_day/model/santo_model.dart';
+import 'package:santo_day/view/widget/appbar.dart';
+import 'package:santo_day/view/widget/default_sant.dart';
+import 'package:santo_day/view/widget/other_sant.dart';
+import 'package:santo_day/view/widget/tomorrow_sant.dart';
 
 class SantoDay extends StatefulWidget {
   const SantoDay({super.key});
@@ -8,28 +15,55 @@ class SantoDay extends StatefulWidget {
 }
 
 class _SantoDayState extends State<SantoDay> {
+  List<SantoModel> santi = [SantoModel(nome: "N/D", urlimmagine: noImg)];
+  SantoModel santoDomani = SantoModel(nome: "N/D", urlimmagine: noImg);
+  SantoModel santoOggi = SantoModel(nome: "N/D", urlimmagine: noImg);
+
+  @override
+  void initState() {
+    super.initState();
+
+    DateTime now = DateTime.now();
+    String date = DateFormat('yyyy-MM-dd').format(now);
+    String tomorrow =
+        DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
+
+    fetchSanto(date).then((value) {
+      setState(() {
+        santi = value;
+      });
+    });
+
+    fetchSanto(date).then(
+      (value) {
+        for (var santo in value) {
+          if (santo.defaults == "1") {
+            setState(() {
+              santoOggi = santo;
+            });
+          }
+        }
+      },
+    );
+
+    fetchSanto(tomorrow).then(
+      (value) {
+        for (var santo in value) {
+          if (santo.defaults == "1") {
+            setState(() {
+              santoDomani = santo;
+            });
+          }
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffffffff),
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xffffffff),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-        ),
-        title: const Text(
-          "SantoDay",
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontStyle: FontStyle.normal,
-            fontSize: 16,
-            color: Color(0xff000000),
-          ),
-        ),
-      ),
+      appBar: getAppbar(),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -60,169 +94,10 @@ class _SantoDayState extends State<SantoDay> {
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.zero,
               ),
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.all(0),
-                shrinkWrap: true,
-                physics: const ClampingScrollPhysics(),
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4.0),
-                        child: const Padding(
-                          padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-                          child:
-
-                              ///***If you have exported images you must have to copy those images in assets/images directory.
-                              Image(
-                            image: NetworkImage(
-                                "https://images.unsplash.com/photo-1517230878791-4d28214057c2?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8c2luZ2VyfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-                            height: 130,
-                            width: 120,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(16, 8, 0, 0),
-                        child: Text(
-                          "Little Ways",
-                          textAlign: TextAlign.start,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontStyle: FontStyle.normal,
-                            fontSize: 12,
-                            color: Color(0xff000000),
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(16, 4, 0, 8),
-                        child: Text(
-                          "Emma Beckett",
-                          textAlign: TextAlign.start,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontStyle: FontStyle.normal,
-                            fontSize: 12,
-                            color: Color(0xff000000),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(4.0),
-                          child: const Padding(
-                            padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
-                            child:
-
-                                ///***If you have exported images you must have to copy those images in assets/images directory.
-                                Image(
-                              image: NetworkImage(
-                                  "https://images.unsplash.com/photo-1612976023590-be5b6a14051d?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTZ8fHNpbmdlcnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-                              height: 130,
-                              width: 120,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(8, 8, 0, 0),
-                          child: Text(
-                            "Waiting",
-                            textAlign: TextAlign.start,
-                            overflow: TextOverflow.clip,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontStyle: FontStyle.normal,
-                              fontSize: 11,
-                              color: Color(0xff000000),
-                            ),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(8, 4, 0, 0),
-                          child: Text(
-                            "Wilden",
-                            textAlign: TextAlign.start,
-                            overflow: TextOverflow.clip,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontStyle: FontStyle.normal,
-                              fontSize: 12,
-                              color: Color(0xff000000),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(4.0),
-                          child:
-
-                              ///***If you have exported images you must have to copy those images in assets/images directory.
-                              const Image(
-                            image: NetworkImage(
-                                "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8c2luZ2VyfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-                            height: 130,
-                            width: 120,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(8, 8, 0, 0),
-                          child: Text(
-                            "I'll Be Fine",
-                            textAlign: TextAlign.start,
-                            overflow: TextOverflow.clip,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontStyle: FontStyle.normal,
-                              fontSize: 12,
-                              color: Color(0xff000000),
-                            ),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(8, 4, 0, 0),
-                          child: Text(
-                            "Birch",
-                            textAlign: TextAlign.start,
-                            overflow: TextOverflow.clip,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontStyle: FontStyle.normal,
-                              fontSize: 12,
-                              color: Color(0xff000000),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              child: DefaultSanto(
+                img: santi[0].urlimmagine!,
+                nome: santi[0].nome!,
+                descrizione: santi[0].descrizione ?? "",
               ),
             ),
             Padding(
@@ -246,226 +121,21 @@ class _SantoDayState extends State<SantoDay> {
                 ],
               ),
             ),
-            ListView(
+            ListView.builder(
               scrollDirection: Axis.vertical,
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4.0),
-                      child:
-
-                          ///***If you have exported images you must have to copy those images in assets/images directory.
-                          const Image(
-                        image: NetworkImage(
-                            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80"),
-                        height: 50,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.max,
-                          children: const [
-                            Text(
-                              "The Way Home",
-                              textAlign: TextAlign.start,
-                              overflow: TextOverflow.clip,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontStyle: FontStyle.normal,
-                                fontSize: 14,
-                                color: Color(0xff000000),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
-                              child: Text(
-                                "AlignQ",
-                                textAlign: TextAlign.start,
-                                overflow: TextOverflow.clip,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: 12,
-                                  color: Color(0xff000000),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const Text(
-                      "3.45",
-                      textAlign: TextAlign.start,
-                      overflow: TextOverflow.clip,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.normal,
-                        fontSize: 14,
-                        color: Color(0xff3a57e8),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4.0),
-                        child:
-
-                            ///***If you have exported images you must have to copy those images in assets/images directory.
-                            const Image(
-                          image: NetworkImage(
-                              "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"),
-                          height: 50,
-                          width: 50,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: const [
-                              Text(
-                                "The Way Home",
-                                textAlign: TextAlign.start,
-                                overflow: TextOverflow.clip,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: 14,
-                                  color: Color(0xff000000),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
-                                child: Text(
-                                  "AlignQ",
-                                  textAlign: TextAlign.start,
-                                  overflow: TextOverflow.clip,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontStyle: FontStyle.normal,
-                                    fontSize: 12,
-                                    color: Color(0xff000000),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const Text(
-                        "5.42",
-                        textAlign: TextAlign.start,
-                        overflow: TextOverflow.clip,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 14,
-                          color: Color(0xff3a57e8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4.0),
-                        child:
-
-                            ///***If you have exported images you must have to copy those images in assets/images directory.
-                            const Image(
-                          image:
-                              NetworkImage("https://picsum.photos/250?image=9"),
-                          height: 50,
-                          width: 50,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: const [
-                              Text(
-                                "The Way Home",
-                                textAlign: TextAlign.start,
-                                overflow: TextOverflow.clip,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: 14,
-                                  color: Color(0xff000000),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
-                                child: Text(
-                                  "AlignX",
-                                  textAlign: TextAlign.start,
-                                  overflow: TextOverflow.clip,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontStyle: FontStyle.normal,
-                                    fontSize: 12,
-                                    color: Color(0xff000000),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const Text(
-                        "5:10",
-                        textAlign: TextAlign.start,
-                        overflow: TextOverflow.clip,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 14,
-                          color: Color(0xff3a57e8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              itemCount: santi.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: OtherSanto(
+                      nome: santi[index].nome ?? "N/D",
+                      descrizione: santi[index].descrizione ?? "",
+                      img: santi[index].urlimmagine ?? noImg),
+                );
+              },
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -490,64 +160,10 @@ class _SantoDayState extends State<SantoDay> {
             ),
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4.0),
-                    child:
-
-                        ///***If you have exported images you must have to copy those images in assets/images directory.
-                        const Image(
-                      image: NetworkImage(
-                          "https://media.istockphoto.com/photos/black-male-guitarist-singing-and-playing-acoustic-guitar-on-stage-picture-id1137781483?b=1&k=20&m=1137781483&s=170667a&w=0&h=-yNllTa_qcqnZWLpqIO9BMv4D8sKkRCA_PO9mIfIVv8="),
-                      height: 60,
-                      width: 60,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.max,
-                        children: const [
-                          Text(
-                            "Sign me to sleep",
-                            textAlign: TextAlign.start,
-                            overflow: TextOverflow.clip,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14,
-                              color: Color(0xff000000),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
-                            child: Text(
-                              "Alan Walker",
-                              textAlign: TextAlign.start,
-                              overflow: TextOverflow.clip,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontStyle: FontStyle.normal,
-                                fontSize: 12,
-                                color: Color(0xff000000),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              child: TomorrowSanto(
+                  img: santoDomani.urlimmagine ?? noImg,
+                  nome: santoDomani.nome ?? "N/D",
+                  descrizione: santoDomani.descrizione ?? ""),
             ),
           ],
         ),
