@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 import 'package:intl/intl.dart';
 import 'package:santo_day/controller/api_controller.dart';
 import 'package:santo_day/model/santo_model.dart';
-import 'package:santo_day/view/widget/appbar.dart';
+//import 'package:santo_day/view/widget/appbar.dart';
 import 'package:santo_day/view/widget/default_sant.dart';
 import 'package:santo_day/view/widget/other_sant.dart';
 import 'package:santo_day/view/widget/tomorrow_sant.dart';
@@ -63,7 +63,7 @@ class _SantoDayState extends State<SantoDay> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffffffff),
-      appBar: getAppbar(),
+      //appBar: getAppbar(),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
